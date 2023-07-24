@@ -16,11 +16,11 @@ namespace WebScrapper
     internal class Scrapper : IDisposable
     {
         private IWebDriver driver;
-        private Configuration config;
-        public Scrapper(Configuration config)
+        private Config config;
+        public Scrapper()
         {
-            string absolutePathToResults = Path.GetFullPath(config.Settings["path_to_results"]);
-            this.config = config;
+            this.config = Config.Instance;
+            string absolutePathToResults = Path.GetFullPath(config.Dict["path_to_results"]);
             try
             {
             var chromeOptions = new ChromeOptions();
@@ -44,20 +44,23 @@ namespace WebScrapper
         {
             int secondsToWaitForDownload = 5;
             Login();
-            foreach (var pair in config.DistrUrls)
+
+            foreach (var pair in config.GroupUrls)
             {
                 driver.Navigate().GoToUrl(pair.Value);
                 DownloadZipFile();
-                string dataPath = config.Settings["path_to_results"] + "\\" + pair.Key + "_" + GetUpdateTime();
+                string dataPath = config.Dict["path_to_results"] + "\\" + pair.Key + "_" + GetStringUpdateTime();
 
                 Thread.Sleep(1000 * secondsToWaitForDownload);
                 secondsToWaitForDownload = 4;
 
-                var downloadedZips = Directory.EnumerateFiles(config.Settings["path_to_results"]);
+                var downloadedZips = Directory.EnumerateFiles(config.Dict["path_to_results"]);
+
+
                 if (!Directory.Exists(dataPath))
                 {
                     Directory.CreateDirectory(dataPath);
-                    ExtractZipsAccordingToDist(dataPath, downloadedZips);
+                    ExtractZipsAccordingToGroup(dataPath, downloadedZips);
                 }
                 else
                 {
@@ -72,7 +75,7 @@ namespace WebScrapper
             }
         }
 
-        private void ExtractZipsAccordingToDist(string dataPath, IEnumerable<string> downloadedZips)
+        private void ExtractZipsAccordingToGroup(string dataPath, IEnumerable<string> downloadedZips)
         {
             foreach (var zipFile in downloadedZips)
             {
@@ -97,14 +100,14 @@ namespace WebScrapper
         }
         private void Login()
         {
-            driver.Navigate().GoToUrl(config.Settings["login_url"]);
+            driver.Navigate().GoToUrl(config.Dict["login_url"]);
             var loginForm = driver.FindElement(By.Name("usrLogin"));
             var passwordForm = driver.FindElement(By.Name("usrPassword"));
             loginForm.SendKeys(config.Username);
             passwordForm.SendKeys(config.Password);
             loginForm.Submit();
         }
-        private string GetUpdateTime() 
+        private string GetStringUpdateTime() 
         {
             string result = "no_time_info";
             string tableText = driver.FindElement(By.ClassName("border1_100")).Text;
