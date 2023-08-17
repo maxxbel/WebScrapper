@@ -50,6 +50,7 @@ namespace WebScrapper
         {
             double milliseconds = double.Parse(Config.Instance.Dict["hours_between_activations"]) * 3600000;
             timer.Interval = milliseconds;
+
             var scrapper = new Scrapper();
             scrapper.DownloadFiles();
             Thread.Sleep(3000);

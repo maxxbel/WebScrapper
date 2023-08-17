@@ -61,7 +61,6 @@ namespace WebScrapper
                     }
 
                     line = sr.ReadLine();
-                    Console.WriteLine(line);
                 }
             }
             return result;
@@ -115,9 +114,9 @@ namespace WebScrapper
                 GroupUrls = ReadDictFromFile(Dict["path_to_distr_urls"]);
             }
 
-            if (!Directory.Exists(Dict["path_to_results"]))
+            if (!Directory.Exists(Dict["path_to_results"] + "\\downloads"))
             {
-                Directory.CreateDirectory(Dict["path_to_results"]);
+                Directory.CreateDirectory(Dict["path_to_results"] + "\\downloads");
             }
         }
 
